@@ -43,8 +43,10 @@ import morphocontour
 # Load your image
 image_path = "path/to/your/image.png"
 
+
+
 # Initialize the contour extraction
-detected_contours = morphocontour.extract_contours(image_path)
+detected_contours, contours_area, contour_centroids, hierarchy = morphocontour.contour_finder(image_path)
 
 # Display or analyze the results
 for contour in detected_contours:
@@ -79,20 +81,10 @@ This project is licensed under the **European Union Public License (EUPL) v1.2 w
 
 For more details, see the full license in the `LICENSE` file.
 
----
-
-## Contributing
-
-Contributions are welcome! If you encounter issues or have suggestions, please:
-
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature/YourFeature`.
-3. Commit your changes: `git commit -m 'Add new feature'`.
-4. Push to the branch: `git push origin feature/YourFeature`.
-5. Open a pull request.
 
 ---
 
 ## Contact
 
 For questions or inquiries, please open an issue on the GitHub repository.
+Contributions are welcome! 
