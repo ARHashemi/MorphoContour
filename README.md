@@ -27,11 +27,11 @@ Clone the repository and import the library into your project:
 # Clone the repository
 git clone https://github.com/ARHashemi/MorphoContour.git
 
-# Install required packages
-pip install -r requirements.txt
-
 # Navigate to the repository directory
 cd MorphoContour
+
+# Install required packages
+pip install -r requirements.txt
 ```
 
 ---
