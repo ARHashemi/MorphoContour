@@ -18,7 +18,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import operator # for sorting and comparing
+# import operator # for sorting and comparing
 import pyefd
 
 def enhance_contrast(image, clipLimit=2.0, tileGridSize=(8, 8)):
@@ -411,7 +411,7 @@ def calculate_pixel_grad(s1, s2):
     grad_y = np.gradient(s2)
     return grad_x, grad_y    
 
-def contour_finder(image_path, crop_x_lim=(400,1100), crop_y_lim=(230,1660), clipLimit=2.0, tileGridSize=(8, 8), threshold=50, binarization_max_val=255, save_contour=False, save_contrast=False, save_binarized=False):
+def contour_finder(image_path, crop_x_lim=(400,1100), crop_y_lim=(230,1660), clipLimit=2.0, tileGridSize=(8, 8), threshold=50, binarization_max_val=255, save_contour=False, save_contrast=False, save_binarized=False, droplet_hierarchy_check=False):
     # Load the image
     # image = cv2.imread(image_path)
     # Crop and remove nozzle
@@ -423,12 +423,12 @@ def contour_finder(image_path, crop_x_lim=(400,1100), crop_y_lim=(230,1660), cli
     # image_contrast = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
     image_contrast = enhance_contrast(cropped_image, clipLimit, tileGridSize)
     if save_contrast:
-        cv2.imwrite(image_path+'_contrast.png', image_contrast)
+        cv2.imwrite(image_path.replace('.jpg','_contrast.png'), image_contrast)
     
     # threshold
     thresh = cv2.threshold(src=image_contrast, thresh=threshold, maxval=binarization_max_val, type=cv2.THRESH_BINARY)[1]
     if save_binarized:
-        cv2.imwrite(image_path+'_binarized.png', thresh)
+        cv2.imwrite(image_path.replace('.jpg','_binarized.png'), thresh)
     
     # find contours
     cntrs, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)#cv2.RETR_EXTERNAL
@@ -445,11 +445,15 @@ def contour_finder(image_path, crop_x_lim=(400,1100), crop_y_lim=(230,1660), cli
             if cv2.contourArea(currentContour) < 30000:
                 (x,y) = get_centroid(currentContour)
                 if y > 20:#100 and y < 1400:# or x < 100 or x > 1000
-                    if currentHierarchy[2] != -1:
-                        # contours.append(currentContour)
-                        # contours_area.append(cv2.contourArea(currentContour))
-                        # contour_centroids.append((x,y))
+                    if droplet_hierarchy_check:
+                        if currentHierarchy[2] == -1:
+                            contours_zip.append((currentContour, cv2.contourArea(currentContour), (x,y)))
+                            # contours.append(currentContour)
+                            # contours_area.append(cv2.contourArea(currentContour))
+                            # contour_centroids.append((x,y))
+                    else:
                         contours_zip.append((currentContour, cv2.contourArea(currentContour), (x,y)))
+
     # for cont in cntrs:#_sorted:
     #     if cv2.contourArea(cont) < 30000:
     #         (x,y) = get_centroid(cont)
@@ -465,7 +469,7 @@ def contour_finder(image_path, crop_x_lim=(400,1100), crop_y_lim=(230,1660), cli
     if save_contour:
         image_with_contours = cropped_image.copy()
         draw_contours_with_different_colors(image_with_contours, contours)
-        cv2.imwrite(image_path+'_contours.jpg', image_with_contours)
+        cv2.imwrite(image_path.replace('.jpg','_contours.png'), image_with_contours)
     # image_with_contours = cropped_image.copy()
     # draw_contours_with_different_colors(image_with_contours, contours)
     # cv2.imwrite(image_path+'_contours.jpg', image_with_contours)
